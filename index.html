@@ -31,7 +31,7 @@ body{
 
 /* header */
 .top{display:flex; align-items:center; justify-content:center; gap:18px; margin-bottom:42px;
-  animation:logoIntro 1.7s cubic-bezier(.65,0,.2,1) both;}
+  animation:riseUp 2.9s cubic-bezier(.65,0,.2,1) both;}
 .logo-tile{
   width:60px; height:60px; border-radius:16px; flex:0 0 auto; padding:12px;
   display:grid; place-items:center;
@@ -39,6 +39,7 @@ body{
   border:1px solid rgba(255,255,255,.55);
   box-shadow:0 8px 26px rgba(0,0,0,.45), 0 0 32px rgba(61,220,138,.07), inset 0 1px 0 rgba(255,255,255,.9);
   transition:transform .2s cubic-bezier(.2,.7,.3,1), box-shadow .2s ease;
+  animation:logoZoom 1.2s cubic-bezier(.5,.1,.2,1) backwards;
 }
 .logo-tile svg{width:100%; height:100%; display:block;}
 .logo-tile:hover{transform:translateY(-2px) rotate(-4deg) scale(1.03);
@@ -48,17 +49,31 @@ body{
   background:linear-gradient(94deg,#EDDC61 0%,#A2D074 46%,#3ddc8a 100%);
   -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;
 }
-/* intro animation: logo lands centered, rises to the top, cards stagger in */
-@keyframes logoIntro{
-  0%   { transform:translateY(calc(50vh - 78px)) scale(.94); opacity:0; }
-  16%  { opacity:1; }
-  46%  { transform:translateY(calc(50vh - 78px)) scale(1); opacity:1; }
-  100% { transform:translateY(0) scale(1); opacity:1; }
+.brand{overflow:hidden; white-space:nowrap;
+  animation:wordReveal .7s cubic-bezier(.5,.1,.2,1) 1.2s backwards;}
+/* intro: big logo centered → shrinks → wordmark wipes in L→R → group rises to top */
+@keyframes logoZoom{
+  0%   { opacity:0; transform:scale(2.3); }
+  12%  { opacity:1; transform:scale(2.3); }
+  100% { opacity:1; transform:scale(1); }
+}
+@keyframes wordReveal{
+  0%   { max-width:0; opacity:0; }
+  12%  { opacity:1; }
+  100% { max-width:460px; opacity:1; }
+}
+@keyframes riseUp{
+  0%   { opacity:0; transform:translateY(calc(50vh - 78px)); }
+  6%   { opacity:1; }
+  66%  { transform:translateY(calc(50vh - 78px)); }
+  100% { transform:translateY(0); }
 }
 @keyframes cardIn{ from{opacity:0; transform:translateY(18px);} to{opacity:1; transform:translateY(0);} }
 @keyframes fadeIn{ from{opacity:0;} to{opacity:1;} }
 @media (prefers-reduced-motion: reduce){
   .top{animation:none;}
+  .logo-tile{animation:none;}
+  .brand{animation:none;}
   .foot{animation:none;}
   .card{animation:none !important; opacity:1 !important; transform:none !important;}
 }
@@ -81,6 +96,21 @@ body{
   box-shadow:inset 0 1px 0 rgba(255,255,255,.07), 0 22px 48px rgba(0,0,0,.44);}
 .card.live:hover::before{opacity:.22;}
 .card.todo{opacity:.55;}
+.card.soon{opacity:.82;}
+/* under-construction caution tape — clipped to the card by .card overflow:hidden */
+.tape{
+  position:absolute; top:50%; left:-30%; width:160%; height:34px; z-index:6;
+  transform:translateY(-50%) rotate(-17deg); pointer-events:none;
+  display:flex; align-items:center; justify-content:center; gap:30px;
+  background:#f4c20d; border-top:3px solid #141414; border-bottom:3px solid #141414;
+  box-shadow:0 8px 22px rgba(0,0,0,.45); overflow:hidden;
+}
+.tape::before{content:""; position:absolute; inset:0; pointer-events:none;
+  background:repeating-linear-gradient(135deg, rgba(0,0,0,.18) 0 11px, transparent 11px 22px);}
+.tape span{
+  position:relative; font-family:var(--mono); font-weight:700; font-size:12px;
+  letter-spacing:.18em; text-transform:uppercase; color:#141414; white-space:nowrap;
+}
 .chead{display:flex; align-items:flex-start; gap:13px; margin-bottom:14px;}
 .chead > div:last-child{padding-top:11px;}
 .ic{
@@ -97,11 +127,12 @@ body{
 .pill{font-family:var(--mono); font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; padding:3px 9px; border-radius:999px;}
 .pill.on{color:var(--teal); background:rgba(61,220,138,.12);}
 .pill.off{color:var(--faint); background:rgba(255,255,255,.04);}
+.pill.soon{color:var(--c,var(--accent)); background:color-mix(in srgb, var(--c,var(--accent)) 15%, transparent);}
 
 .foot{margin-top:36px; padding-top:18px; border-top:1px solid var(--line-2);
   font-family:var(--mono); font-size:11px; color:var(--faint); letter-spacing:.04em;
   display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
-  animation:fadeIn .6s ease 2.2s both;}
+  animation:fadeIn .6s ease 3.2s both;}
 @media(max-width:980px){ .grid{grid-template-columns:repeat(2,minmax(0,1fr));} }
 @media(max-width:560px){ .wrap{padding:32px 18px 48px;} .grid{grid-template-columns:1fr;} }
 </style>
@@ -134,7 +165,7 @@ body{
 
   <div class="foot">
     <span id="cnt"></span>
-    <span>Mera Cannabis · internal use</span>
+    <span>Mera Cannabis · internal use · Built by: Jeremy Gagnon</span>
   </div>
 </div>
 
@@ -162,7 +193,7 @@ const DASHBOARDS = [
     desc:'Dried-flower buying — suppliers, contracted buy prices, volumes and spend.',
     repo:'flower-procurement-dashboard',
     url:'',                       // e.g. 'https://USER.github.io/flower-procurement-dashboard/'
-    accent:'#e879b9', icon:'flower'
+    accent:'#e879b9', icon:'flower', soon:true
   },
   {
     name:'PO Tracker',
@@ -170,7 +201,7 @@ const DASHBOARDS = [
     desc:'Purchase orders end to end — allocate by SKU, track status and PO financials.',
     repo:'po-tracker',
     url:'',
-    accent:'#5b9bf0', icon:'doc'
+    accent:'#5b9bf0', icon:'doc', wip:true, soon:true
   },
   {
     name:'Procurement Dashboard',
@@ -178,7 +209,7 @@ const DASHBOARDS = [
     desc:'Harwill packaging-materials procurement and inventory overview.',
     repo:'procurement-dashboard',
     url:'',
-    accent:'#97cf3f', icon:'box'
+    accent:'#97cf3f', icon:'box', wip:true, soon:true
   },
 ];
 
@@ -202,22 +233,24 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 let liveCount = 0;
 const cards = [];
 DASHBOARDS.forEach(d=>{
+  const soon = !!d.soon;
   const href = resolve(d);
-  const live = !!href;
+  const live = !!href && !soon;
   if(live) liveCount++;
   const el = document.createElement(live ? 'a' : 'div');
-  el.className = 'card ' + (live ? 'live' : 'todo');
+  el.className = 'card ' + (live ? 'live' : soon ? 'soon' : 'todo') + (d.wip ? ' wip' : '');
   el.style.setProperty('--c', d.accent || 'var(--accent)');
   if(live){ el.href = href; el.target = '_blank'; el.rel = 'noopener'; }
   if(!reduceMotion) el.style.opacity = '0';
   el.innerHTML = `
+    ${d.wip ? '<div class="tape" aria-hidden="true"><span>Under Construction</span><span>Under Construction</span><span>Under Construction</span></div>' : ''}
     <div class="chead">
       <div class="ic">${ICONS[d.icon]||ICONS.chart}</div>
       <div><div class="cname">${d.name}</div></div>
     </div>
     <div class="cfoot">
-      <span class="open">${live ? 'Open dashboard' : 'Link not set'} <span class="arr">${live?'→':'·'}</span></span>
-      <span class="pill ${live?'on':'off'}">${live?'Live':'Set up'}</span>
+      <span class="open">${live ? 'Open dashboard' : soon ? 'Coming soon' : 'Link not set'} <span class="arr">${live?'→':'·'}</span></span>
+      <span class="pill ${live?'on':soon?'soon':'off'}">${live?'Live':soon?'Coming Soon':'Set up'}</span>
     </div>`;
   grid.appendChild(el);
   cards.push(el);
@@ -225,7 +258,7 @@ DASHBOARDS.forEach(d=>{
 
 /* after the logo settles at the top, reveal the cards one by one */
 if(!reduceMotion){
-  const START = 1500, STEP = 130;
+  const START = 2900, STEP = 130;
   cards.forEach((el, i)=>{
     setTimeout(()=>{
       el.style.animation = 'cardIn .55s cubic-bezier(.2,.7,.3,1) both';
